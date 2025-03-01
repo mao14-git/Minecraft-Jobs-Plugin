@@ -1,0 +1,12 @@
+name: JobsPlugin
+main: org.example.JobsPlugin
+version: 1.0
+api-version: 1.20
+author: Mao
+commands:
+  job:
+    description: Check or manage job info
+    usage: /job <help|info|stats|show> <player>
+  jobadmin:
+    description: Manage player job EXP (OP only)
+    usage: /jobadmin <add|remove|reset> <job> <player> [amount]

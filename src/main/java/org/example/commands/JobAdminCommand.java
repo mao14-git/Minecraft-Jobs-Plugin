@@ -62,7 +62,7 @@ public class JobAdminCommand implements CommandExecutor {
             }
             try {
                 int addAmount = Integer.parseInt(args[3]);
-                addXPToJob(data, job, addAmount);
+                addXPToJob(data, job, addAmount, player);
                 plugin.updateScoreboard(player);
                 player.sendMessage(ChatColor.DARK_AQUA + "Added " + addAmount + " XP to " + target.getName() + "'s " + job + " job.");
             } catch (NumberFormatException e) {
@@ -93,10 +93,10 @@ public class JobAdminCommand implements CommandExecutor {
     }
 
     // Helper method add EXP for a specific job.
-    private void addXPToJob(JobData data, String job, int amount){
+    private void addXPToJob(JobData data, String job, int amount, Player player){
         switch(job){
             case "mining":
-                data.addMiningEXP(amount);
+                data.addMiningEXP(amount, player);
                 break;
             case "woodcutting":
                 data.addWoodcuttingEXP(amount);
@@ -109,12 +109,28 @@ public class JobAdminCommand implements CommandExecutor {
     private void removeXPFromJob(JobData data, String job, int amount){
         switch(job) {
             case "mining":
-                int currentMiningEXP = data.getMiningExp();
-                data.setMiningXP(Math.max(currentMiningEXP - amount, 0));
+                int currentMiningExp = data.getMiningExp();
+                int miningLevel = data.getMiningLevel();
+                currentMiningExp -= amount;
+                while(currentMiningExp < 0 && miningLevel > 0){
+                    miningLevel--;
+                    int expForLevel = 100 * (miningLevel + 1);
+                    currentMiningExp += expForLevel;
+                }
+                data.setMiningLevel(miningLevel);
+                data.setMiningXP(currentMiningExp);
                 break;
             case "woodcutting":
-                int currentWoodXP = data.getWoodcuttingEXP();
-                data.setWoodcuttingXP(Math.max(currentWoodXP - amount, 0));
+                int currentWoodcuttingExp = data.getWoodcuttingExp();
+                int woodcuttingLevel = data.getWoodcuttingLevel();
+                currentWoodcuttingExp -= amount;
+                while(currentWoodcuttingExp < 0 && woodcuttingLevel > 0){
+                    woodcuttingLevel--;
+                    int expForLevel = 100 * (woodcuttingLevel + 1);
+                    currentWoodcuttingExp += expForLevel;
+                }
+                data.setMiningLevel(woodcuttingLevel);
+                data.setMiningXP(currentWoodcuttingExp);
                 break;
             default:
                 break;

@@ -43,8 +43,8 @@ public class JobCommand implements CommandExecutor {
             int miningExpNeeded = 100 * (data.getMiningLevel() + 1);
             int woodcuttingExpNeeded = 100 * (data.getWoodcuttingLevel() + 1);
             player.sendMessage(ChatColor.GOLD + "===== [ Your job Stats ] =====");
-            player.sendMessage(ChatColor.YELLOW + "Mining level: "+ ChatColor.AQUA + data.getMiningLevel() + ChatColor.WHITE + " -> " + ChatColor.AQUA + data.getMiningExp() + "/" + miningExpNeeded + " EXP");
-            player.sendMessage(ChatColor.YELLOW + "Woodcutting Level: " + ChatColor.AQUA + data.getWoodcuttingLevel() + ChatColor.WHITE + " -> " + ChatColor.AQUA + data.getWoodcuttingEXP() + "/" + woodcuttingExpNeeded + " EXP");
+            player.sendMessage(ChatColor.YELLOW + "Mining level: " + ChatColor.AQUA + data.getMiningLevel() + ChatColor.WHITE + " -> " + ChatColor.AQUA + data.getMiningExp() + "/" + miningExpNeeded + " EXP");
+            player.sendMessage(ChatColor.YELLOW + "Woodcutting Level: " + ChatColor.AQUA + data.getWoodcuttingLevel() + ChatColor.WHITE + " -> " + ChatColor.AQUA + data.getWoodcuttingExp() + "/" + woodcuttingExpNeeded + " EXP");
             return true;
         }
 
@@ -91,7 +91,7 @@ public class JobCommand implements CommandExecutor {
             int targetWoodcuttingExpNeeded = 100 * (targetData.getWoodcuttingLevel() + 1);
             player.sendMessage(ChatColor.GOLD + "===== [ Your job Stats ] =====");
             player.sendMessage(ChatColor.YELLOW + "Mining level: "+ ChatColor.AQUA + targetData.getMiningLevel() + ChatColor.WHITE + " -> " + ChatColor.AQUA + targetData.getMiningExp() + ChatColor.DARK_AQUA + "/" + targetMiningExpNeeded + " EXP");
-            player.sendMessage(ChatColor.YELLOW + "Woodcutting Level: " + ChatColor.AQUA + targetData.getWoodcuttingLevel() + ChatColor.WHITE + " -> " + ChatColor.AQUA + targetData.getWoodcuttingEXP() + ChatColor.DARK_AQUA + "/" + targetWoodcuttingExpNeeded + " EXP");
+            player.sendMessage(ChatColor.YELLOW + "Woodcutting Level: " + ChatColor.AQUA + targetData.getWoodcuttingLevel() + ChatColor.WHITE + " -> " + ChatColor.AQUA + targetData.getWoodcuttingExp() + ChatColor.DARK_AQUA + "/" + targetWoodcuttingExpNeeded + " EXP");
             return true;
         }
 

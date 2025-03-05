@@ -1,5 +1,9 @@
 package org.example;
 
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
 public class JobData {
 
     // Mining fields
@@ -45,7 +49,7 @@ public class JobData {
         this.woodcuttingLevel = woodcuttingLevel;
     }
 
-    public int getWoodcuttingEXP() {
+    public int getWoodcuttingExp() {
         return woodcuttingXP;
     }
 
@@ -55,12 +59,14 @@ public class JobData {
 
 
     // Helper method to handle Exp gain and check for level-ups
-    public void addMiningEXP(int amount) {
+    public void addMiningEXP(int amount, Player player) {
         miningXP += amount;
         int xpNeeded = 100 * (miningLevel + 1);
         while (miningXP >= xpNeeded) {
             miningXP -= xpNeeded;
             miningLevel++;
+            player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 12000, 0));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 12000, 0));
             xpNeeded = 100 * (miningLevel + 1);
         }
     }

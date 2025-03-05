@@ -6,7 +6,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -18,12 +17,6 @@ public class JobListener implements Listener {
     }
 
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event){
-        if(!plugin.showScoreboardOffByDefault.contains(event.getPlayer().getUniqueId())){
-            plugin.showScoreboard(event.getPlayer());
-        }
-    }
 
     // If a player places a block which would give exp, add it to the List
     @EventHandler
@@ -56,12 +49,10 @@ public class JobListener implements Listener {
         int miningEXP = plugin.getMiningExp(blockType);
         if (miningEXP > 0) {
             int miningLevel = data.getMiningLevel();
-            data.addMiningEXP(miningEXP);
+            data.addMiningEXP(miningEXP, player);
             plugin.updateScoreboard(player);
             int miningLevel2 = data.getMiningLevel();
             if (miningLevel2 != miningLevel) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 12000, 0));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 12000, 0));
                 int miningExpNeeded = 100 * (data.getMiningLevel() + 1);
                 player.sendTitle("", "Mining Level up! (Mining Level: " + miningLevel2 + " - " + data.getMiningExp() + "/" + miningExpNeeded + " EXP).", 20, 60, 40);
             }

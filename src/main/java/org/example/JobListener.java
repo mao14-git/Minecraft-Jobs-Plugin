@@ -1,16 +1,16 @@
 package org.example;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class JobListener implements Listener {
-    private JobsPlugin plugin;
+    private final JobsPlugin plugin;
 
     public JobListener(JobsPlugin plugin) {
         this.plugin = plugin;
@@ -54,9 +54,10 @@ public class JobListener implements Listener {
             int miningLevel2 = data.getMiningLevel();
             if (miningLevel2 != miningLevel) {
                 int miningExpNeeded = 100 * (data.getMiningLevel() + 1);
-                player.sendTitle("", "Mining Level up! (Mining Level: " + miningLevel2 + " - " + data.getMiningExp() + "/" + miningExpNeeded + " EXP).", 20, 60, 40);
+                player.sendTitle("", "Mining Level up!", 20, 60, 40);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                        new TextComponent("Mining Level: " + miningLevel2 + " - " + data.getMiningExp() + "/" + miningExpNeeded + " EXP"));
             }
-
         }
 
         // ----------------- WOODCUTTING ----------------- //
@@ -67,10 +68,10 @@ public class JobListener implements Listener {
             plugin.updateScoreboard(player);
             int woodcuttingLevel2 = data.getWoodcuttingLevel();
             if (woodcuttingLevel2 != woodcuttingLevel) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 12000, 0));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 12000, 0));
                 int woodcuttingExpNeeded = 100 * (data.getWoodcuttingLevel() + 1);
-                player.sendTitle("", "Woodcutting Level up! (Woodcutting Level: " + woodcuttingLevel2 + " - " + data.getMiningExp() + "/" + woodcuttingExpNeeded + " EXP).", 20, 60, 40);
+                player.sendTitle("", "Woodcutting Level up!", 10, 60, 40);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                        new TextComponent("Woodcutting Level: " + woodcuttingLevel2 + " - " + data.getWoodcuttingExp() + "/" + woodcuttingExpNeeded + " EXP"));
             }
         }
             }

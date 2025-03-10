@@ -105,6 +105,7 @@ public class VeinMiningListener implements Listener {
             ExperienceOrb orb = ore.getWorld().spawn(ore.getLocation().add(0.5, 0.5, 0.5), ExperienceOrb.class);
             orb.setExperience(ExpDrop);
             Sound breakSound = Sound.BLOCK_STONE_BREAK;
+            player.swingMainHand();
             ore.getWorld().playSound(ore.getLocation(), breakSound, 1.0F, 1.0F);
             ore.getWorld().spawnParticle(Particle.FALLING_DUST,
                     ore.getLocation().add(0.5, 0.5, 0.5), 10, 0.2, 0.2, 0.2, ore.getBlockData());

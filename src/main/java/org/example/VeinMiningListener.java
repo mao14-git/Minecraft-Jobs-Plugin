@@ -1,6 +1,9 @@
 package org.example;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -21,6 +24,8 @@ import org.bukkit.entity.Player;
 public class VeinMiningListener implements Listener {
 
     public final JobsPlugin plugin;
+    // Cooldown Map for vein mining skill
+    private final Map<UUID, Long> skillCooldowns = new HashMap<>();
 
     public VeinMiningListener(JobsPlugin plugin) {
         this.plugin = plugin;
@@ -53,7 +58,7 @@ public class VeinMiningListener implements Listener {
 
         Material oreType = clickedBlock.getType();
         // Only allow vein mining on ores out of Blocks.yml
-        if(!plugin.isOreConfigured(oreType)) {
+        if(!plugin.isMiningOreConfigured(oreType)) {
             return;
         }
 
@@ -73,18 +78,18 @@ public class VeinMiningListener implements Listener {
         }
 
         // Check for skill cooldown
-        if(plugin.isSkillOnCooldown(player)){
-            long remaining = plugin.getSkillCooldownRemaining(player) / 1000;
+        if(isSkillOnCooldown(player)){
+            long remaining = getSkillCooldownRemaining(player) / 1000;
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    new TextComponent(ChatColor.RED + "Skill cooldown " + remaining + "s"));
+                    new TextComponent(ChatColor.RED + "Vein Mining cooldown " + remaining + "s"));
             return;
         }
 
         // Set the cooldown to 10seconds
-        plugin.setSkillCooldown(player, 10000L);
+        setSkillCooldown(player, 10000L);
 
         // Find all Connected ore of the same type
-        Set<Block> veinBlocks = plugin.findConnectedOres(clickedBlock, oreType);
+        Set<Block> veinBlocks = plugin.findConnectedBlock(clickedBlock, oreType);
 
         // Calculate the total Exp of every destroyed block
         int totalMiningExp = 0;
@@ -99,16 +104,17 @@ public class VeinMiningListener implements Listener {
 
         // Destroy each ore block naturally (so that Enchantments on tool apply)
 
+        player.swingMainHand();
         for(Block ore : veinBlocks){
             int ExpDrop = plugin.getOreExpDrop(ore.getType());
             ore.breakNaturally(tool);
             ExperienceOrb orb = ore.getWorld().spawn(ore.getLocation().add(0.5, 0.5, 0.5), ExperienceOrb.class);
             orb.setExperience(ExpDrop);
             Sound breakSound = Sound.BLOCK_STONE_BREAK;
-            player.swingMainHand();
             ore.getWorld().playSound(ore.getLocation(), breakSound, 1.0F, 1.0F);
             ore.getWorld().spawnParticle(Particle.FALLING_DUST,
-                    ore.getLocation().add(0.5, 0.5, 0.5), 10, 0.2, 0.2, 0.2, ore.getBlockData());
+                    ore.getLocation().add(0.5, 0.5, 0.5),
+                    10, 0.2, 0.2, 0.2, ore.getBlockData());
         }
 
         // add Exp to job
@@ -121,4 +127,34 @@ public class VeinMiningListener implements Listener {
 
         event.setCancelled(true);
     }
+
+    // Vein Mining Cooldown Methods
+    public boolean isSkillOnCooldown(Player player) {
+        long currentTime = System.currentTimeMillis();
+        Long availableTime = skillCooldowns.get(player.getUniqueId());
+        return availableTime != null && currentTime < availableTime;
+    }
+    public void setSkillCooldown(Player player, long cooldownMillis) {
+        long availableTime = System.currentTimeMillis() + cooldownMillis;
+        skillCooldowns.put(player.getUniqueId(), availableTime);
+
+        long delayTicks = cooldownMillis / 50L;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()){
+                plugin.playCooldownReadySound(player);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                        new TextComponent(ChatColor.AQUA + "Vein Mining is ready again"));
+            }
+        }, delayTicks);
+    }
+    public long getSkillCooldownRemaining(Player player) {
+        Long availableTime = skillCooldowns.get(player.getUniqueId());
+        if (availableTime == null) {
+            return 0;
+        }
+        long remaining = availableTime - System.currentTimeMillis();
+        return remaining > 0 ? remaining : 0;
+    }
+    //-----------------------------------------------
+
 }

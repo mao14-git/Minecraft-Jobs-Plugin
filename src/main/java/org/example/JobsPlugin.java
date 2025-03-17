@@ -29,8 +29,6 @@ public class JobsPlugin extends JavaPlugin {
     private File playerDataFile;
     private FileConfiguration playerDataConfig;
 
-    // Which Blocks will be important for the jobs
-    private File blockConfigFile;
     private FileConfiguration blockConfig;
     private HashMap<Material, Integer> miningEXPMap = new HashMap<>();
     private HashMap<Material, Integer> woodcuttingEXPMap = new HashMap<>();
@@ -46,8 +44,7 @@ public class JobsPlugin extends JavaPlugin {
 
     // Save UUID of players who doesn't want to keep the Scoreboard on
     public Set<UUID> showScoreboardOffByDefault = new HashSet<>();
-    // Cooldown Map for vein mining skill
-    private final Map<UUID, Long> skillCooldowns = new HashMap<>();
+
 
     @Override
     public void onEnable() {
@@ -65,6 +62,8 @@ public class JobsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new JobListener(this), this);
         getServer().getPluginManager().registerEvents(new ScoreboardListener(this), this);
         getServer().getPluginManager().registerEvents(new VeinMiningListener(this), this);
+        getServer().getPluginManager().registerEvents(new TreeFellerListener(this), this);
+        getServer().getPluginManager().registerEvents(new StructureSaverListener(this), this);
 
         // Register commands
         getCommand("job").setExecutor(new JobCommand(this));
@@ -116,7 +115,8 @@ public class JobsPlugin extends JavaPlugin {
 
     // What gives Exp for everyjob
     private void loadBlockConfig() {
-        blockConfigFile = new File(getDataFolder(), "blocks.yml");
+        // Which Blocks will be important for the jobs
+        File blockConfigFile = new File(getDataFolder(), "blocks.yml");
         saveResource("blocks.yml", true);
         blockConfig = YamlConfiguration.loadConfiguration(blockConfigFile);
     }
@@ -298,33 +298,6 @@ public class JobsPlugin extends JavaPlugin {
     }
     //-----------------------------------------------
 
-    // Vein Mining Cooldown Methods
-    public boolean isSkillOnCooldown(Player player) {
-        long currentTime = System.currentTimeMillis();
-        Long availableTime = skillCooldowns.get(player.getUniqueId());
-        return availableTime != null && currentTime < availableTime;
-    }
-    public void setSkillCooldown(Player player, long cooldownMillis) {
-        long availableTime = System.currentTimeMillis() + cooldownMillis;
-        skillCooldowns.put(player.getUniqueId(), availableTime);
-
-        long delayTicks = cooldownMillis / 50L;
-        Bukkit.getScheduler().runTaskLater(this, () -> {
-            if (player.isOnline()){
-                playCooldownReadySound(player);
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        new TextComponent(ChatColor.AQUA + "Vein Mining is ready again"));
-            }
-        }, delayTicks);
-    }
-    public long getSkillCooldownRemaining(Player player) {
-        Long availableTime = skillCooldowns.get(player.getUniqueId());
-        if (availableTime == null) {
-            return 0;
-        }
-        long remaining = availableTime - System.currentTimeMillis();
-        return remaining > 0 ? remaining : 0;
-    }
     public void playCooldownReadySound(Player player) {
         // plays a sound after the skill is ready. 3 chimes each after 0.1 seconds (2 ticks)
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1.0F, 1.2F);
@@ -332,16 +305,18 @@ public class JobsPlugin extends JavaPlugin {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1.0F, 1.6F);
             Bukkit.getScheduler().runTaskLater(this, () -> {
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1.0F, 1.4F);
-                }, 2L);
             }, 2L);
+        }, 2L);
 
 
     }
-    //-----------------------------------------------
 
     // Check if the ore is in Blocks.yml
-    public boolean isOreConfigured(Material oreType) {
+    public boolean isMiningOreConfigured(Material oreType) {
         return miningEXPMap.containsKey(oreType);
+    }
+    public boolean isWoodcuttingBlockConfigured(Material oreType) {
+        return woodcuttingEXPMap.containsKey(oreType);
     }
     // Validate if Pickaxe in hand is valid for each ore
     public boolean isValidPickaxeForOre(ItemStack tool, Material oreType) {
@@ -373,7 +348,7 @@ public class JobsPlugin extends JavaPlugin {
 
     }
     // Flood-fill to find all connected ore blocks of the same type
-    public Set<Block> findConnectedOres(Block start, Material oreType) {
+    public Set<Block> findConnectedBlock(Block start, Material oreType) {
         Set<Block> found = new HashSet<>();
         Queue<Block> queue = new LinkedList<>();
         queue.add(start);

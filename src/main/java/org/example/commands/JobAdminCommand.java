@@ -75,7 +75,7 @@ public class JobAdminCommand implements CommandExecutor {
             }
             try {
                 int removeAmount = Integer.parseInt(args[3]);
-                removeXPFromJob(data, job, removeAmount);
+                removeXPFromJob(data, job, removeAmount, player);
                 plugin.updateScoreboard(player);
                 player.sendMessage(ChatColor.DARK_AQUA + "Removed " + removeAmount + " XP to " + target.getName() + "'s " + job + " job.");
             } catch (NumberFormatException e) {
@@ -99,14 +99,14 @@ public class JobAdminCommand implements CommandExecutor {
                 data.addMiningEXP(amount, player);
                 break;
             case "woodcutting":
-                data.addWoodcuttingEXP(amount);
+                data.addWoodcuttingEXP(amount, player);
                 break;
             default:
                 break;
         }
     }
     // Helper method remove EXP for a specific Job.
-    private void removeXPFromJob(JobData data, String job, int amount){
+    private void removeXPFromJob(JobData data, String job, int amount, Player sender){
         switch(job) {
             case "mining":
                 int currentMiningExp = data.getMiningExp();
@@ -118,7 +118,7 @@ public class JobAdminCommand implements CommandExecutor {
                     currentMiningExp += expForLevel;
                 }
                 data.setMiningLevel(miningLevel);
-                data.setMiningXP(currentMiningExp);
+                data.setMiningExp(currentMiningExp);
                 break;
             case "woodcutting":
                 int currentWoodcuttingExp = data.getWoodcuttingExp();
@@ -129,10 +129,11 @@ public class JobAdminCommand implements CommandExecutor {
                     int expForLevel = 100 * (woodcuttingLevel + 1);
                     currentWoodcuttingExp += expForLevel;
                 }
-                data.setMiningLevel(woodcuttingLevel);
-                data.setMiningXP(currentWoodcuttingExp);
+                data.setWoodcuttingLevel(woodcuttingLevel);
+                data.setWoodcuttingExp(currentWoodcuttingExp);
                 break;
             default:
+                sender.sendMessage(ChatColor.DARK_AQUA + "Wrong job name. Available jobs: <mining|woodcutting>");
                 break;
 
         }
@@ -143,11 +144,11 @@ public class JobAdminCommand implements CommandExecutor {
         switch(job){
             case "mining":
                 data.setMiningLevel(0);
-                data.setMiningXP(0);
+                data.setMiningExp(0);
                 break;
             case "woodcutting":
                 data.setWoodcuttingLevel(0);
-                data.setWoodcuttingXP(0);
+                data.setWoodcuttingExp(0);
                 break;
             default:
                 break;

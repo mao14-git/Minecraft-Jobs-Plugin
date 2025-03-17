@@ -35,7 +35,7 @@ public class JobData {
         return miningXP;
     }
 
-    public void setMiningXP(int miningXP) {
+    public void setMiningExp(int miningXP) {
         this.miningXP = miningXP;
     }
 
@@ -53,7 +53,7 @@ public class JobData {
         return woodcuttingXP;
     }
 
-    public void setWoodcuttingXP(int woodcuttingXP) {
+    public void setWoodcuttingExp(int woodcuttingXP) {
         this.woodcuttingXP = woodcuttingXP;
     }
 
@@ -71,12 +71,14 @@ public class JobData {
         }
     }
 
-    public void addWoodcuttingEXP(int amount) {
+    public void addWoodcuttingEXP(int amount, Player player) {
         woodcuttingXP += amount;
         int xpNeeded = 100 * (woodcuttingLevel + 1);
         while (woodcuttingXP >= xpNeeded) {
             woodcuttingXP -= xpNeeded;
             woodcuttingLevel++;
+            player.addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 12000, 0));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 12000, 0));
             xpNeeded = 100 * (woodcuttingLevel + 1);
         }
     }

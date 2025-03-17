@@ -64,7 +64,7 @@ public class JobListener implements Listener {
         int woodcuttingEXP = plugin.getWoodcuttingExp(blockType);
         if (woodcuttingEXP > 0) {
             int woodcuttingLevel = data.getWoodcuttingLevel();
-            data.addWoodcuttingEXP(woodcuttingEXP);
+            data.addWoodcuttingEXP(woodcuttingEXP, player);
             plugin.updateScoreboard(player);
             int woodcuttingLevel2 = data.getWoodcuttingLevel();
             if (woodcuttingLevel2 != woodcuttingLevel) {

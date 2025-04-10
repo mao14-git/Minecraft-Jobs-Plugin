@@ -58,7 +58,7 @@ public class JobsPlugin extends JavaPlugin {
 
         // Register the event listener
         getServer().getPluginManager().registerEvents(new JobListener(this), this);
-        getServer().getPluginManager().registerEvents(new ScoreboardListener(this), this);
+        getServer().getPluginManager().registerEvents(new OnJoinListener(this), this);
         getServer().getPluginManager().registerEvents(new VeinMiningListener(this), this);
         getServer().getPluginManager().registerEvents(new TreeFellerListener(this), this);
         getServer().getPluginManager().registerEvents(new StructureSaverListener(this), this);
